@@ -7,7 +7,9 @@
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
   "files": [
-    "/dist"
+    "/dist",
+    "/src",
+    "tsconfig.json"
   ],
   "eslintConfig": {
     "root": true,
@@ -37,6 +39,7 @@
     "build": "tsc -p .",
     "format": "prettier --write  '*.{json,js}' 'src/**/*.{js,ts}' 'test/**/*.{js,ts}'",
     "lint": "eslint --max-warnings=0 src && prettier --check '*.{json,js}' 'src/**/*.{js,ts}' 'test/**/*.{js,ts}'",
-    "test": "echo \"No tests specified\""
+    "test": "echo \"No tests specified\"",
+    "postinstall": "npm run build"
   }
 }
