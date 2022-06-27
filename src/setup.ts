@@ -55,7 +55,7 @@ const createCommands = async (
 
   const request = new Request(url, {
     method: "PUT",
-    body: JSON.stringify(commands),
+    body: JSON.stringify(commands.map(([command]) => (command))),
     headers: { "Content-Type": "application/json", Authorization: `Bearer ${bearer}` },
   });
 
