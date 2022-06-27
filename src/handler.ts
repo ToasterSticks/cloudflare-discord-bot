@@ -1,9 +1,10 @@
 import { Router } from "itty-router";
+import { RESTPostAPIChatInputApplicationCommandsJSONBody } from "discord-api-types/v10";
 import { setup } from "./setup";
 import { authorize } from "./authorize";
 import { interaction } from "./interaction";
 import { Permissions } from "./permissions";
-import { ApplicationCommand, InteractionHandler } from "./types";
+import { InteractionHandler } from "./types";
 
 const router = Router();
 
@@ -12,7 +13,7 @@ export type Application = {
   applicationSecret: string;
   publicKey: string;
   guildId?: string;
-  commands: [ApplicationCommand, InteractionHandler][];
+  commands: [RESTPostAPIChatInputApplicationCommandsJSONBody, InteractionHandler][];
   components?: { [key: string]: InteractionHandler };
   permissions: Permissions;
 };
@@ -20,7 +21,7 @@ export type Application = {
 export type DictCommands = Record<
   string,
   {
-    command: ApplicationCommand;
+    command: RESTPostAPIChatInputApplicationCommandsJSONBody;
     handler: InteractionHandler;
   }
 >;

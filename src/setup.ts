@@ -1,6 +1,7 @@
 import { Buffer } from "buffer";
+import { RESTPostAPIChatInputApplicationCommandsJSONBody } from "discord-api-types/v10";
 import type { Application } from "./handler";
-import { ApplicationCommand, InteractionHandler } from "./types";
+import { InteractionHandler } from "./types";
 
 const btoa = (value: string) => Buffer.from(value, "binary").toString("base64");
 
@@ -38,27 +39,6 @@ const resolveCommandsEndpoint = (applicationId: string, guildId?: string): strin
   return `${url}/commands`;
 };
 
-const deleteExistingCommands = async (applicationId: string, bearer: any, guildId?: string): Promise<void> => {
-  const url = resolveCommandsEndpoint(applicationId, guildId);
-
-  const request = new Request(url, {
-    method: "GET",
-    headers: { "Content-Type": "application/json", Authorization: `Bearer ${bearer}` },
-  });
-
-  const response = await fetch(request);
-  const commands = await response.json();
-
-  await Promise.all(
-    commands.map((command: ApplicationCommand & { id: string; application_id: string }) => {
-      return fetch(`${url}/${command.id}`, {
-        method: "DELETE",
-        headers: { Authorizaton: `Bearer ${bearer}` },
-      });
-    })
-  );
-};
-
 const createCommands = async (
   {
     applicationId,
@@ -67,38 +47,20 @@ const createCommands = async (
   }: {
     applicationId: string;
     guildId?: string;
-    commands: [ApplicationCommand, InteractionHandler][];
+    commands: [RESTPostAPIChatInputApplicationCommandsJSONBody, InteractionHandler][];
   },
   bearer: any
 ): Promise<Response> => {
   const url = resolveCommandsEndpoint(applicationId, guildId);
 
-  const promises = commands.map(async ([command, handler]) => {
-    const request = new Request(url, {
-      method: "POST",
-      body: JSON.stringify(command),
-      headers: { "Content-Type": "application/json", Authorization: `Bearer ${bearer}` },
-    });
-
-    try {
-      const response = await fetch(request);
-
-      return { [command.name]: await response.json() };
-    } catch (e: unknown) {
-      // e is typeof unknown due to error handling. We expect it to be a Error, if its not then the message and stack properties should be undefined and not used.
-      const { message, stack } = <Error>e;
-      return {
-        [command.name]: {
-          message,
-          stack,
-          info: `Setting command ${command.name} failed!`,
-        },
-      };
-    }
+  const request = new Request(url, {
+    method: "PUT",
+    body: JSON.stringify(commands),
+    headers: { "Content-Type": "application/json", Authorization: `Bearer ${bearer}` },
   });
 
-  return await Promise.all(promises)
-    .then((result) => new Response(JSON.stringify(result.reduce((acc, cur) => ({ ...acc, ...cur }), {}))))
+  return fetch(request)
+    .then(() => new Response("OK"))
     .catch((e) => new Response(e.message, { status: 502 }));
 };
 
@@ -113,8 +75,7 @@ export const setup = ({ applicationId, applicationSecret, guildId, commands }: A
     try {
       const bearer = await getAuthorizationCode(headers);
 
-      await deleteExistingCommands(applicationId, bearer);
-      return await createCommands({ applicationId, guildId, commands }, bearer);
+      return createCommands({ applicationId, guildId, commands }, bearer);
     } catch {
       return new Response(JSON.stringify({ error: "Failed to authenticate with Discord. Are the Application ID and secret set correctly?" }), {
         status: 407,

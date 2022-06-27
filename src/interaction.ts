@@ -1,6 +1,7 @@
 import nacl from "tweetnacl";
 import { Buffer } from "buffer";
-import { ApplicationCommand, InteractionHandler, Interaction, InteractionType, InteractionResponseType } from "./types";
+import { InteractionType, APIInteraction } from "discord-api-types/v10";
+import { InteractionHandler } from "./types";
 import type { DictCommands } from "./handler";
 
 const makeValidator =
@@ -36,7 +37,7 @@ export const interaction = ({
     try {
       await validateRequest(request.clone());
       try {
-        const interaction = (await request.json()) as Interaction;
+        const interaction = (await request.json()) as APIInteraction;
 
         let handler: InteractionHandler;
 
@@ -54,6 +55,9 @@ export const interaction = ({
             handler = components[interaction.data.custom_id];
             break;
           }
+          case InteractionType.ApplicationCommandAutocomplete:
+          case InteractionType.ModalSubmit:
+            return new Response(null, { status: 500 });
         }
         if (handler! === undefined) return new Response(null, { status: 500 });
         return jsonResponse(await handler(interaction, ...extra));
