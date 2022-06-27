@@ -60,7 +60,6 @@ const interaction = ({ publicKey, commands, components = {}, }) => {
             console.error(e.message);
             return new Response(null, { status: 401 });
         }
-        return new Response(null, { status: 500 });
     };
 };
 exports.interaction = interaction;

@@ -69,6 +69,5 @@ export const interaction = ({
       console.error(e.message);
       return new Response(null, { status: 401 });
     }
-    return new Response(null, { status: 500 });
   };
 };
