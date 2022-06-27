@@ -35,7 +35,7 @@ const createCommands = async ({ applicationId, guildId, commands, }, bearer) => 
     const url = resolveCommandsEndpoint(applicationId, guildId);
     const request = new Request(url, {
         method: "PUT",
-        body: JSON.stringify(commands),
+        body: JSON.stringify(commands.map(([command]) => (command))),
         headers: { "Content-Type": "application/json", Authorization: `Bearer ${bearer}` },
     });
     return fetch(request)
