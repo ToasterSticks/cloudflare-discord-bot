@@ -34,7 +34,7 @@ const interaction = ({ publicKey, commands, components = {}, }) => {
                     case v10_1.InteractionType.ApplicationCommand: {
                         if (interaction.data?.name === undefined)
                             break;
-                        handler = commands[interaction.data.name].handler;
+                        handler = commands.get(interaction.data.name)?.handler;
                         break;
                     }
                     case v10_1.InteractionType.MessageComponent: {

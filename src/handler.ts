@@ -8,30 +8,25 @@ import { InteractionHandler } from "./types";
 
 const router = Router();
 
+type Command = RESTPostAPIChatInputApplicationCommandsJSONBody & { handler: InteractionHandler };
+
 export type Application = {
   applicationId: string;
   applicationSecret: string;
   publicKey: string;
   guildId?: string;
-  commands: [RESTPostAPIChatInputApplicationCommandsJSONBody, InteractionHandler][];
+  commands: Command[];
   components?: { [key: string]: InteractionHandler };
-  permissions: Permissions;
+  permissions?: Permissions;
 };
 
-export type DictCommands = Record<
-  string,
-  {
-    command: RESTPostAPIChatInputApplicationCommandsJSONBody;
-    handler: InteractionHandler;
-  }
->;
+export type CommandStore = Map<string, Command>;
 
 export const createApplicationCommandHandler = (application: Application) => {
   router.get("/", authorize(application.applicationId, application.permissions));
-  const commands = application.commands.reduce((_commands, command) => {
-    _commands[command[0].name] = { command: command[0], handler: command[1] };
-    return _commands;
-  }, <DictCommands>{});
+  const commands = application.commands.reduce((_commands, command) =>
+    _commands.set(command.name, command), <CommandStore>new Map()
+  );
   router.post("/interaction", interaction({ publicKey: application.publicKey, commands, components: application.components }));
   router.get("/setup", setup(application));
   return router.handle;

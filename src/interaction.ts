@@ -2,7 +2,7 @@ import nacl from "tweetnacl";
 import { Buffer } from "buffer";
 import { InteractionType, APIInteraction } from "discord-api-types/v10";
 import { InteractionHandler } from "./types";
-import type { DictCommands } from "./handler";
+import type { CommandStore } from "./handler";
 
 const makeValidator =
   ({ publicKey }: { publicKey: string }) =>
@@ -28,7 +28,7 @@ export const interaction = ({
   components = {},
 }: {
   publicKey: string;
-  commands: DictCommands;
+  commands: CommandStore;
   components?: { [key: string]: InteractionHandler };
 }) => {
   return async (request: Request, ...extra: any): Promise<Response> => {
@@ -39,7 +39,7 @@ export const interaction = ({
       try {
         const interaction = (await request.json()) as APIInteraction;
 
-        let handler: InteractionHandler;
+        let handler: InteractionHandler | undefined;
 
         switch (interaction.type) {
           case InteractionType.Ping: {
@@ -47,7 +47,7 @@ export const interaction = ({
           }
           case InteractionType.ApplicationCommand: {
             if (interaction.data?.name === undefined) break;
-            handler = commands[interaction.data.name].handler;
+            handler = commands.get(interaction.data.name)?.handler;
             break;
           }
           case InteractionType.MessageComponent: {
@@ -59,7 +59,7 @@ export const interaction = ({
           case InteractionType.ModalSubmit:
             return new Response(null, { status: 500 });
         }
-        if (handler! === undefined) return new Response(null, { status: 500 });
+        if (handler === undefined) return new Response(null, { status: 500 });
         return jsonResponse(await handler(interaction, ...extra));
       } catch (e: any) {
         console.log(e.message);

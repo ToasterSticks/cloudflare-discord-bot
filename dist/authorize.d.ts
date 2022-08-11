@@ -1,3 +1,3 @@
 import { Permissions } from "./permissions";
-export declare const authorize: (applicationId: string, permissions: Permissions) => () => Promise<Response>;
+export declare const authorize: (applicationId: string, permissions?: Permissions | undefined) => () => Promise<Response>;
 //# sourceMappingURL=authorize.d.ts.map

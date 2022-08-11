@@ -1,8 +1,8 @@
 import { InteractionHandler } from "./types";
-import type { DictCommands } from "./handler";
+import type { CommandStore } from "./handler";
 export declare const interaction: ({ publicKey, commands, components, }: {
     publicKey: string;
-    commands: DictCommands;
+    commands: CommandStore;
     components?: {
         [key: string]: InteractionHandler;
     } | undefined;

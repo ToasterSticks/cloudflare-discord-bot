@@ -1,10 +1,14 @@
 import { Permissions } from "./permissions";
 
-export const authorize = (applicationId: string, permissions: Permissions) => async (): Promise<Response> => {
+export const authorize = (applicationId: string, permissions?: Permissions) => async (): Promise<Response> => {
   const urlSearchParams = new URLSearchParams({
     client_id: applicationId,
-    scope: "bot applications.commands",
-    permissions: permissions.compute(),
+    ...(permissions
+      ? {
+          scope: "bot applications.commands",
+          permissions: permissions.compute(),
+        }
+      : { scope: "applications.commands" }),
   });
 
   const redirectURL = new URL(`https://discord.com/oauth2/authorize`);

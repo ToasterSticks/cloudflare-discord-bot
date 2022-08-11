@@ -47,7 +47,7 @@ const createCommands = async (
   }: {
     applicationId: string;
     guildId?: string;
-    commands: [RESTPostAPIChatInputApplicationCommandsJSONBody, InteractionHandler][];
+    commands: RESTPostAPIChatInputApplicationCommandsJSONBody[];
   },
   bearer: any
 ): Promise<Response> => {
@@ -55,7 +55,7 @@ const createCommands = async (
 
   const request = new Request(url, {
     method: "PUT",
-    body: JSON.stringify(commands.map(([command]) => (command))),
+    body: JSON.stringify(commands),
     headers: { "Content-Type": "application/json", Authorization: `Bearer ${bearer}` },
   });
 
@@ -75,7 +75,7 @@ export const setup = ({ applicationId, applicationSecret, guildId, commands }: A
     try {
       const bearer = await getAuthorizationCode(headers);
 
-      return createCommands({ applicationId, guildId, commands }, bearer);
+      return createCommands({ applicationId, guildId, commands: commands.map(({ handler, ...c }) => c) }, bearer);
     } catch {
       return new Response(JSON.stringify({ error: "Failed to authenticate with Discord. Are the Application ID and secret set correctly?" }), {
         status: 407,

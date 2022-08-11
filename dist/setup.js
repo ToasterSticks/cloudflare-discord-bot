@@ -35,7 +35,7 @@ const createCommands = async ({ applicationId, guildId, commands, }, bearer) => 
     const url = resolveCommandsEndpoint(applicationId, guildId);
     const request = new Request(url, {
         method: "PUT",
-        body: JSON.stringify(commands.map(([command]) => (command))),
+        body: JSON.stringify(commands),
         headers: { "Content-Type": "application/json", Authorization: `Bearer ${bearer}` },
     });
     return fetch(request)
@@ -50,7 +50,7 @@ const setup = ({ applicationId, applicationSecret, guildId, commands }) => {
     return async () => {
         try {
             const bearer = await getAuthorizationCode(headers);
-            return createCommands({ applicationId, guildId, commands }, bearer);
+            return createCommands({ applicationId, guildId, commands: commands.map(({ handler, ...c }) => c) }, bearer);
         }
         catch {
             return new Response(JSON.stringify({ error: "Failed to authenticate with Discord. Are the Application ID and secret set correctly?" }), {
