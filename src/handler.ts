@@ -8,7 +8,7 @@ import { InteractionHandler } from "./types";
 
 const router = Router();
 
-type Command = RESTPostAPIChatInputApplicationCommandsJSONBody & { handler: InteractionHandler };
+export type Command = RESTPostAPIChatInputApplicationCommandsJSONBody & { handler: InteractionHandler };
 
 export type Application = {
   applicationId: string;
@@ -24,9 +24,7 @@ export type CommandStore = Map<string, Command>;
 
 export const createApplicationCommandHandler = (application: Application) => {
   router.get("/", authorize(application.applicationId, application.permissions));
-  const commands = application.commands.reduce((_commands, command) =>
-    _commands.set(command.name, command), <CommandStore>new Map()
-  );
+  const commands = application.commands.reduce((_commands, command) => _commands.set(command.name, command), <CommandStore>new Map());
   router.post("/interaction", interaction({ publicKey: application.publicKey, commands, components: application.components }));
   router.get("/setup", setup(application));
   return router.handle;
