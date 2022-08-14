@@ -8,19 +8,19 @@ import { InteractionHandler } from "./types";
 
 const router = Router();
 
-export type Command = RESTPostAPIChatInputApplicationCommandsJSONBody & {
+export interface Command extends RESTPostAPIChatInputApplicationCommandsJSONBody {
   handler: InteractionHandler;
   components?: Record<string, InteractionHandler>;
-};
+}
 
-export type Application = {
+export interface Application {
   applicationId: string;
   applicationSecret: string;
   publicKey: string;
   guildId?: string;
   commands: Command[];
   permissions?: Permissions;
-};
+}
 
 export type CommandStore = Map<string, Command>;
 
