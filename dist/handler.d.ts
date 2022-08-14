@@ -3,6 +3,7 @@ import { Permissions } from "./permissions";
 import { InteractionHandler } from "./types";
 export declare type Command = RESTPostAPIChatInputApplicationCommandsJSONBody & {
     handler: InteractionHandler;
+    components?: Record<string, InteractionHandler>;
 };
 export declare type Application = {
     applicationId: string;
@@ -10,9 +11,6 @@ export declare type Application = {
     publicKey: string;
     guildId?: string;
     commands: Command[];
-    components?: {
-        [key: string]: InteractionHandler;
-    };
     permissions?: Permissions;
 };
 export declare type CommandStore = Map<string, Command>;

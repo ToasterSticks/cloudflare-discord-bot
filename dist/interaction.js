@@ -19,7 +19,7 @@ const makeValidator = ({ publicKey }) => async (request) => {
 const jsonResponse = (data) => new Response(JSON.stringify(data), {
     headers: { "Content-Type": "application/json" },
 });
-const interaction = ({ publicKey, commands, components = {}, }) => {
+const interaction = ({ publicKey, commands }) => {
     return async (request, ...extra) => {
         const validateRequest = makeValidator({ publicKey });
         try {
@@ -32,22 +32,23 @@ const interaction = ({ publicKey, commands, components = {}, }) => {
                         return jsonResponse({ type: 1 });
                     }
                     case v10_1.InteractionType.ApplicationCommand: {
-                        if (interaction.data?.name === undefined)
+                        if (!interaction.data?.name)
                             break;
                         handler = commands.get(interaction.data.name)?.handler;
                         break;
                     }
                     case v10_1.InteractionType.MessageComponent: {
-                        if (interaction.data?.custom_id === undefined)
+                        const commandInteraction = interaction.message.interaction;
+                        if (!interaction.data?.custom_id || !commandInteraction)
                             break;
-                        handler = components[interaction.data.custom_id];
+                        handler = commands.get(commandInteraction.name.split(" ")[0])?.components?.[interaction.data.custom_id];
                         break;
                     }
                     case v10_1.InteractionType.ApplicationCommandAutocomplete:
                     case v10_1.InteractionType.ModalSubmit:
                         return new Response(null, { status: 500 });
                 }
-                if (handler === undefined)
+                if (!handler)
                     return new Response(null, { status: 500 });
                 return jsonResponse(await handler(interaction, ...extra));
             }

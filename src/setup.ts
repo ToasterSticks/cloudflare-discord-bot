@@ -1,7 +1,6 @@
 import { Buffer } from "buffer";
 import { RESTPostAPIChatInputApplicationCommandsJSONBody } from "discord-api-types/v10";
 import type { Application } from "./handler";
-import { InteractionHandler } from "./types";
 
 const btoa = (value: string) => Buffer.from(value, "binary").toString("base64");
 
@@ -75,7 +74,7 @@ export const setup = ({ applicationId, applicationSecret, guildId, commands }: A
     try {
       const bearer = await getAuthorizationCode(headers);
 
-      return createCommands({ applicationId, guildId, commands: commands.map(({ handler, ...c }) => c) }, bearer);
+      return createCommands({ applicationId, guildId, commands: commands.map(({ handler, components, ...c }) => c) }, bearer);
     } catch {
       return new Response(JSON.stringify({ error: "Failed to authenticate with Discord. Are the Application ID and secret set correctly?" }), {
         status: 407,

@@ -1,1 +1,1 @@
-{"version":3,"file":"interaction.d.ts","sourceRoot":"","sources":["../src/interaction.ts"],"names":[],"mappings":"AAGA,OAAO,EAAE,kBAAkB,EAAE,MAAM,SAAS,CAAC;AAC7C,OAAO,KAAK,EAAE,YAAY,EAAE,MAAM,WAAW,CAAC;AAoB9C,eAAO,MAAM,WAAW;eAKX,MAAM;;;;;gBAIM,OAAO,YAAY,GAAG,KAAG,QAAQ,QAAQ,CAuCjE,CAAC"}
+{"version":3,"file":"interaction.d.ts","sourceRoot":"","sources":["../src/interaction.ts"],"names":[],"mappings":"AAGA,OAAO,EAAE,kBAAkB,EAAE,MAAM,SAAS,CAAC;AAC7C,OAAO,KAAK,EAAE,YAAY,EAAE,MAAM,WAAW,CAAC;AAoB9C,eAAO,MAAM,WAAW;eAA0C,MAAM;;;;;gBAC/C,OAAO,YAAY,GAAG,KAAG,QAAQ,QAAQ,CAwCjE,CAAC"}

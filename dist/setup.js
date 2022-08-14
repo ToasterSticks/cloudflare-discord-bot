@@ -50,7 +50,7 @@ const setup = ({ applicationId, applicationSecret, guildId, commands }) => {
     return async () => {
         try {
             const bearer = await getAuthorizationCode(headers);
-            return createCommands({ applicationId, guildId, commands: commands.map(({ handler, ...c }) => c) }, bearer);
+            return createCommands({ applicationId, guildId, commands: commands.map(({ handler, components, ...c }) => c) }, bearer);
         }
         catch {
             return new Response(JSON.stringify({ error: "Failed to authenticate with Discord. Are the Application ID and secret set correctly?" }), {

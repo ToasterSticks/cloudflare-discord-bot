@@ -22,15 +22,7 @@ const jsonResponse = (data: any) =>
     headers: { "Content-Type": "application/json" },
   });
 
-export const interaction = ({
-  publicKey,
-  commands,
-  components = {},
-}: {
-  publicKey: string;
-  commands: CommandStore;
-  components?: { [key: string]: InteractionHandler };
-}) => {
+export const interaction = ({ publicKey, commands }: { publicKey: string; commands: CommandStore; components?: { [key: string]: InteractionHandler } }) => {
   return async (request: Request, ...extra: any): Promise<Response> => {
     const validateRequest = makeValidator({ publicKey });
 
@@ -46,20 +38,21 @@ export const interaction = ({
             return jsonResponse({ type: 1 });
           }
           case InteractionType.ApplicationCommand: {
-            if (interaction.data?.name === undefined) break;
+            if (!interaction.data?.name) break;
             handler = commands.get(interaction.data.name)?.handler;
             break;
           }
           case InteractionType.MessageComponent: {
-            if (interaction.data?.custom_id === undefined) break;
-            handler = components[interaction.data.custom_id];
+            const commandInteraction = interaction.message.interaction;
+            if (!interaction.data?.custom_id || !commandInteraction) break;
+            handler = commands.get(commandInteraction.name.split(" ")[0])?.components?.[interaction.data.custom_id];
             break;
           }
           case InteractionType.ApplicationCommandAutocomplete:
           case InteractionType.ModalSubmit:
             return new Response(null, { status: 500 });
         }
-        if (handler === undefined) return new Response(null, { status: 500 });
+        if (!handler) return new Response(null, { status: 500 });
         return jsonResponse(await handler(interaction, ...extra));
       } catch (e: any) {
         console.log(e.message);
