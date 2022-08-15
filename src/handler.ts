@@ -3,7 +3,10 @@ import {
   APIApplicationCommandInteraction,
   APIChatInputApplicationCommandInteraction,
   APIContextMenuInteraction,
+  APIMessageApplicationCommandInteraction,
   APIMessageComponentInteraction,
+  APIUserApplicationCommandInteraction,
+  ApplicationCommandType,
   RESTPostAPIChatInputApplicationCommandsJSONBody,
 } from "discord-api-types/v10";
 import { setup } from "./setup";
@@ -14,9 +17,16 @@ import { InteractionHandler } from "./types";
 
 const router = Router();
 
-export interface Command<T extends "ChatInput" | "ContextMenu" | unknown = unknown> extends RESTPostAPIChatInputApplicationCommandsJSONBody {
+export interface Command<T extends ApplicationCommandType.ChatInput | ApplicationCommandType.Message | ApplicationCommandType.User | unknown = unknown>
+  extends RESTPostAPIChatInputApplicationCommandsJSONBody {
   handler: InteractionHandler<
-    T extends "ChatInput" ? APIChatInputApplicationCommandInteraction : T extends "ContextMenu" ? APIContextMenuInteraction : APIApplicationCommandInteraction
+    T extends ApplicationCommandType.ChatInput
+      ? APIChatInputApplicationCommandInteraction
+      : T extends ApplicationCommandType.Message
+      ? APIMessageApplicationCommandInteraction
+      : T extends ApplicationCommandType.User
+      ? APIUserApplicationCommandInteraction
+      : APIApplicationCommandInteraction
   >;
   components?: Record<string, InteractionHandler<APIMessageComponentInteraction>>;
 }
