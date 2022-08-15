@@ -1,6 +1,6 @@
-import { APIApplicationCommandInteraction, APIInteractionResponse, APIMessageComponentInteraction } from "discord-api-types/v10";
+import { APIInteraction, APIInteractionResponse } from "discord-api-types/v10";
 
-export type InteractionHandler = (
-  interaction: APIApplicationCommandInteraction | APIMessageComponentInteraction,
+export type InteractionHandler<T extends APIInteraction = APIInteraction> = (
+  interaction: T,
   ...extra: any
 ) => Promise<APIInteractionResponse> | APIInteractionResponse;

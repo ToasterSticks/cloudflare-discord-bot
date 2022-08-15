@@ -50,6 +50,7 @@ const interaction = ({ publicKey, commands }) => {
                 }
                 if (!handler)
                     return new Response(null, { status: 500 });
+                // @ts-expect-error
                 return jsonResponse(await handler(interaction, ...extra));
             }
             catch (e) {

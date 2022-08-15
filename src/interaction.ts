@@ -1,6 +1,6 @@
 import nacl from "tweetnacl";
 import { Buffer } from "buffer";
-import { InteractionType, APIInteraction } from "discord-api-types/v10";
+import { InteractionType, APIInteraction, APIApplicationCommandInteraction, APIMessageComponentInteraction } from "discord-api-types/v10";
 import { InteractionHandler } from "./types";
 import type { CommandStore } from "./handler";
 
@@ -31,7 +31,7 @@ export const interaction = ({ publicKey, commands }: { publicKey: string; comman
       try {
         const interaction = (await request.json()) as APIInteraction;
 
-        let handler: InteractionHandler | undefined;
+        let handler: InteractionHandler<APIApplicationCommandInteraction> | InteractionHandler<APIMessageComponentInteraction> | undefined;
 
         switch (interaction.type) {
           case InteractionType.Ping: {
@@ -53,6 +53,7 @@ export const interaction = ({ publicKey, commands }: { publicKey: string; comman
             return new Response(null, { status: 500 });
         }
         if (!handler) return new Response(null, { status: 500 });
+        // @ts-expect-error
         return jsonResponse(await handler(interaction, ...extra));
       } catch (e: any) {
         console.log(e.message);

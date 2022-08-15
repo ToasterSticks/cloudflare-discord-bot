@@ -1,5 +1,11 @@
 import { Router } from "itty-router";
-import { RESTPostAPIChatInputApplicationCommandsJSONBody } from "discord-api-types/v10";
+import {
+  APIApplicationCommandInteraction,
+  APIChatInputApplicationCommandInteraction,
+  APIContextMenuInteraction,
+  APIMessageComponentInteraction,
+  RESTPostAPIChatInputApplicationCommandsJSONBody,
+} from "discord-api-types/v10";
 import { setup } from "./setup";
 import { authorize } from "./authorize";
 import { interaction } from "./interaction";
@@ -8,9 +14,11 @@ import { InteractionHandler } from "./types";
 
 const router = Router();
 
-export interface Command extends RESTPostAPIChatInputApplicationCommandsJSONBody {
-  handler: InteractionHandler;
-  components?: Record<string, InteractionHandler>;
+export interface Command<T extends "ChatInput" | "ContextMenu" | unknown = unknown> extends RESTPostAPIChatInputApplicationCommandsJSONBody {
+  handler: InteractionHandler<
+    T extends "ChatInput" ? APIChatInputApplicationCommandInteraction : T extends "ContextMenu" ? APIContextMenuInteraction : APIApplicationCommandInteraction
+  >;
+  components?: Record<string, InteractionHandler<APIMessageComponentInteraction>>;
 }
 
 export interface Application {
