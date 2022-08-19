@@ -1,7 +1,7 @@
 import nacl from "tweetnacl";
 import { Buffer } from "buffer";
 import { InteractionType, APIInteraction, APIApplicationCommandInteraction, APIMessageComponentInteraction } from "discord-api-types/v10";
-import { InteractionHandler } from "./types";
+import { InteractionHandler, InteractionHandlerReturn } from "./types";
 import type { CommandStore } from "./handler";
 
 const makeValidator =
@@ -17,10 +17,25 @@ const makeValidator =
     if (!isValid) throw new Error("Invalid request");
   };
 
-const jsonResponse = (data: any) =>
-  new Response(JSON.stringify(data), {
-    headers: { "Content-Type": "application/json" },
-  });
+const isFileUpload = (data: InteractionHandlerReturn) => data.files && data.files.length > 0;
+
+const formDataResponse = (data: InteractionHandlerReturn) => {
+  const formData = new FormData();
+
+  data.files?.forEach((file) => formData.append(file.name, new Blob([file.data]), file.name));
+  delete data.files;
+
+  formData.append("payload_json", JSON.stringify(data));
+
+  return new Response(formData);
+};
+
+const jsonResponse = (data: InteractionHandlerReturn) =>
+  isFileUpload(data)
+    ? formDataResponse(data)
+    : new Response(JSON.stringify(data), {
+        headers: { "Content-Type": "application/json" },
+      });
 
 export const interaction = ({ publicKey, commands }: { publicKey: string; commands: CommandStore; components?: { [key: string]: InteractionHandler } }) => {
   return async (request: Request, ...extra: any): Promise<Response> => {

@@ -16,9 +16,19 @@ const makeValidator = ({ publicKey }) => async (request) => {
     if (!isValid)
         throw new Error("Invalid request");
 };
-const jsonResponse = (data) => new Response(JSON.stringify(data), {
-    headers: { "Content-Type": "application/json" },
-});
+const isFileUpload = (data) => data.files && data.files.length > 0;
+const formDataResponse = (data) => {
+    const formData = new FormData();
+    data.files?.forEach((file) => formData.append(file.name, new Blob([file.data]), file.name));
+    delete data.files;
+    formData.append("payload_json", JSON.stringify(data));
+    return new Response(formData);
+};
+const jsonResponse = (data) => isFileUpload(data)
+    ? formDataResponse(data)
+    : new Response(JSON.stringify(data), {
+        headers: { "Content-Type": "application/json" },
+    });
 const interaction = ({ publicKey, commands }) => {
     return async (request, ...extra) => {
         const validateRequest = makeValidator({ publicKey });
