@@ -1,7 +1,7 @@
 import { APIInteraction, APIInteractionResponse } from "discord-api-types/v10";
 interface File {
     name: string;
-    data: string;
+    data: any;
 }
 export declare type InteractionHandlerReturn = APIInteractionResponse & {
     files?: File[];
