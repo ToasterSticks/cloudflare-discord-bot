@@ -49,14 +49,15 @@ const interaction = ({ publicKey, commands }) => {
                     }
                     case v10_1.InteractionType.MessageComponent: {
                         const commandInteraction = interaction.message.interaction;
-                        if (!interaction.data?.custom_id || !commandInteraction)
+                        if (!commandInteraction)
                             break;
                         handler = commands.get(commandInteraction.name.split(" ")[0])?.components?.[interaction.data.custom_id];
                         break;
                     }
-                    case v10_1.InteractionType.ApplicationCommandAutocomplete:
                     case v10_1.InteractionType.ModalSubmit:
-                        return new Response(null, { status: 500 });
+                        handler = commands.get(interaction.data.custom_id)?.modal;
+                        break;
+                    case v10_1.InteractionType.ApplicationCommandAutocomplete:
                 }
                 if (!handler)
                     return new Response(null, { status: 500 });

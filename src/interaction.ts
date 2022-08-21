@@ -1,6 +1,12 @@
 import nacl from "tweetnacl";
 import { Buffer } from "buffer";
-import { InteractionType, APIInteraction, APIApplicationCommandInteraction, APIMessageComponentInteraction } from "discord-api-types/v10";
+import {
+  InteractionType,
+  APIInteraction,
+  APIApplicationCommandInteraction,
+  APIMessageComponentInteraction,
+  APIModalSubmitInteraction,
+} from "discord-api-types/v10";
 import { InteractionHandler, InteractionHandlerReturn } from "./types";
 import type { CommandStore } from "./handler";
 
@@ -46,7 +52,11 @@ export const interaction = ({ publicKey, commands }: { publicKey: string; comman
       try {
         const interaction = (await request.json()) as APIInteraction;
 
-        let handler: InteractionHandler<APIApplicationCommandInteraction> | InteractionHandler<APIMessageComponentInteraction> | undefined;
+        let handler:
+          | InteractionHandler<APIApplicationCommandInteraction>
+          | InteractionHandler<APIMessageComponentInteraction>
+          | InteractionHandler<APIModalSubmitInteraction>
+          | undefined;
 
         switch (interaction.type) {
           case InteractionType.Ping: {
@@ -59,13 +69,14 @@ export const interaction = ({ publicKey, commands }: { publicKey: string; comman
           }
           case InteractionType.MessageComponent: {
             const commandInteraction = interaction.message.interaction;
-            if (!interaction.data?.custom_id || !commandInteraction) break;
+            if (!commandInteraction) break;
             handler = commands.get(commandInteraction.name.split(" ")[0])?.components?.[interaction.data.custom_id];
             break;
           }
-          case InteractionType.ApplicationCommandAutocomplete:
           case InteractionType.ModalSubmit:
-            return new Response(null, { status: 500 });
+            handler = commands.get(interaction.data.custom_id)?.modal;
+            break;
+          case InteractionType.ApplicationCommandAutocomplete:
         }
         if (!handler) return new Response(null, { status: 500 });
         // @ts-expect-error

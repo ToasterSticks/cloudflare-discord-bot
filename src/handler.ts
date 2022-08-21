@@ -5,6 +5,7 @@ import {
   APIContextMenuInteraction,
   APIMessageApplicationCommandInteraction,
   APIMessageComponentInteraction,
+  APIModalSubmitInteraction,
   APIUserApplicationCommandInteraction,
   ApplicationCommandType,
   RESTPostAPIChatInputApplicationCommandsJSONBody,
@@ -28,6 +29,7 @@ export interface Command<T extends ApplicationCommandType.ChatInput | Applicatio
       ? APIUserApplicationCommandInteraction
       : APIApplicationCommandInteraction
   >;
+  modal?: InteractionHandler<APIModalSubmitInteraction>;
   components?: Record<string, InteractionHandler<APIMessageComponentInteraction>>;
 }
 
