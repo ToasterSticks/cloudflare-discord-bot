@@ -55,7 +55,7 @@ const interaction = ({ publicKey, commands }) => {
                         break;
                     }
                     case v10_1.InteractionType.ModalSubmit:
-                        handler = commands.get(interaction.data.custom_id)?.modal;
+                        handler = commands.get(interaction.data.custom_id.split(":")[0])?.modal;
                         break;
                     case v10_1.InteractionType.ApplicationCommandAutocomplete:
                 }

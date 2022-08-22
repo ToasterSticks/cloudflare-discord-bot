@@ -74,7 +74,7 @@ export const interaction = ({ publicKey, commands }: { publicKey: string; comman
             break;
           }
           case InteractionType.ModalSubmit:
-            handler = commands.get(interaction.data.custom_id)?.modal;
+            handler = commands.get(interaction.data.custom_id.split(":")[0])?.modal;
             break;
           case InteractionType.ApplicationCommandAutocomplete:
         }
